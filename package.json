@@ -1,0 +1,106 @@
+{
+  "name": "markdown-rest-preview",
+  "displayName": "Markdown REST Preview",
+  "description": "Write markdown with executable REST requests in preview mode.",
+  "version": "0.1.0",
+  "publisher": "local-dev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/markdown-rest-preview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/markdown-rest-preview/issues"
+  },
+  "homepage": "https://github.com/your-org/markdown-rest-preview#readme",
+  "keywords": [
+    "rest",
+    "http",
+    "markdown",
+    "api",
+    "rest-client"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:markdownRestPreview.open",
+    "onCommand:markdownRestPreview.switchEnvironment"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "markdownRestPreview.open",
+        "title": "Markdown REST: Open Preview"
+      },
+      {
+        "command": "markdownRestPreview.switchEnvironment",
+        "title": "Markdown REST: Switch Environment"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "markdownRestPreview.open",
+          "when": "editorLangId == markdown",
+          "group": "navigation@100"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "markdownRestPreview.open",
+          "when": "resourceLangId == markdown",
+          "group": "navigation@100"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "markdownRestPreview.open",
+          "when": "resourceLangId == markdown",
+          "group": "navigation@100"
+        }
+      ],
+      "tab/context": [
+        {
+          "command": "markdownRestPreview.open",
+          "when": "resourceLangId == markdown",
+          "group": "navigation@100"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "markdownRestPreview.open",
+          "when": "resourceExtname == .md",
+          "group": "navigation@100"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Markdown REST Preview",
+      "properties": {
+        "markdownRestPreview.environment": {
+          "type": "string",
+          "default": "",
+          "description": "Environment name from rest-client.environmentVariables to resolve {{variables}}."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^20.14.12",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.0"
+  }
+}
