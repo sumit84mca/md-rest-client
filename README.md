@@ -1,4 +1,4 @@
-# Markdown REST Preview
+# MdRestClient
 
 VS Code extension to write documentation in Markdown and run REST requests directly from preview.
 
@@ -56,3 +56,22 @@ This extension includes/adapts patterns from:
 3. markdown-it (MIT): https://github.com/markdown-it/markdown-it
 
 See `THIRD_PARTY_NOTICES.md` for details.
+
+## CI/CD pipelines
+
+This repo includes two GitHub Actions workflows:
+
+1. **Release package** (`.github/workflows/release-package.yml`)
+   - Runs on tag push `v*` and manual dispatch.
+   - Builds `.vsix`.
+   - Uploads `.vsix` artifact.
+   - On tag pushes, creates GitHub release and attaches `.vsix`.
+
+2. **Publish marketplace** (`.github/workflows/publish-marketplace.yml`)
+   - Runs on manual dispatch or published GitHub release.
+   - Publishes extension with `vsce publish`.
+
+Required setup:
+
+1. Set `publisher` in `package.json` to your VS Code Marketplace publisher id (not `local-dev`).
+2. Add repo secret `VSCE_PAT` with Marketplace Personal Access Token.

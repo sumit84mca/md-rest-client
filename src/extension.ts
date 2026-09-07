@@ -67,7 +67,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const panel = vscode.window.createWebviewPanel(
       "markdownRestPreview",
-      `Markdown REST Preview: ${document.fileName.split("\\").pop() ?? "Untitled"}`,
+      `MdRestClient: ${document.fileName.split("\\").pop() ?? "Untitled"}`,
       vscode.ViewColumn.Beside,
       { enableScripts: true, retainContextWhenHidden: true }
     );
@@ -148,7 +148,7 @@ export function activate(context: vscode.ExtensionContext): void {
         if (!responsePanel) {
           responsePanel = vscode.window.createWebviewPanel(
             "markdownRestResponse",
-            "MarkREST Response",
+            "MdRestClient Response",
             targetColumn,
             { enableScripts: false, retainContextWhenHidden: true }
           );

@@ -1,0 +1,40 @@
+name: Publish marketplace
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Validate publisher
+        run: |
+          PUBLISHER=$(node -p "require('./package.json').publisher")
+          if [ "$PUBLISHER" = "local-dev" ]; then
+            echo "package.json publisher is local-dev. Set your Marketplace publisher id first."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile
+        run: npm run compile
+
+      - name: Publish to VS Code Marketplace
+        run: npx @vscode/vsce publish -p "${{ secrets.VSCE_PAT }}"
