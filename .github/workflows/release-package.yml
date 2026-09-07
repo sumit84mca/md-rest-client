@@ -50,6 +50,12 @@ jobs:
           name: md-rest-client-vsix
           path: "*.vsix"
 
+      - name: Enforce version bump
+        if: steps.tagcheck.outputs.exists == 'true'
+        run: |
+          echo "Version v${{ steps.version.outputs.value }} already released. Bump package.json version before merge."
+          exit 1
+
       - name: Create GitHub release
         if: steps.tagcheck.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
