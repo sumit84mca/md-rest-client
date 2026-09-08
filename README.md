@@ -56,3 +56,9 @@ This extension includes/adapts patterns from:
 3. markdown-it (MIT): https://github.com/markdown-it/markdown-it
 
 See `THIRD_PARTY_NOTICES.md` for details.
+
+## CI and security checks
+
+Repository workflows for CI/security live in `.github/workflows/`.
+
+Rollout details and enforcement phases: `docs/ci-security.md`.
