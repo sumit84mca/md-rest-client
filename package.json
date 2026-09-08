@@ -99,7 +99,7 @@
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.14.12",
     "@types/vscode": "^1.90.0",
-    "typescript": "^5.5.4"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "markdown-it": "^14.1.0"
