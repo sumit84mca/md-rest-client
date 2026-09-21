@@ -97,7 +97,7 @@
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^26.5.1",
+    "@types/node": "^26.6.1",
     "@types/vscode": "^1.137.0",
     "typescript": "^5.5.4"
   },
