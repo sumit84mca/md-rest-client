@@ -1,4 +1,5 @@
 import MarkdownIt from "markdown-it";
+import hljs from "highlight.js";
 import { RequestBlock } from "../types";
 import { escapeHtml } from "../utils/text";
 
@@ -6,7 +7,7 @@ export function buildPreviewHtml(markdownSource: string): { html: string; reques
   const requests: RequestBlock[] = [];
   let index = 0;
 
-  const transformed = markdownSource.replace(/```http\s*([\s\S]*?)```/gi, (_match, block) => {
+  const transformed = markdownSource.replace(/```+\s*http(?:[^\r\n]*)\r?\n([\s\S]*?)```/gi, (_match, block) => {
     index += 1;
     const id = `req-${index}`;
     const raw = String(block).trim();
@@ -39,6 +40,7 @@ export function buildPreviewHtml(markdownSource: string): { html: string; reques
     .code-toolbar { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--vscode-panel-border); background: var(--vscode-editorWidget-background); }
     .code-language { font-size: 0.85rem; color: var(--vscode-descriptionForeground); text-transform: lowercase; }
     .code-block pre { margin: 0; padding: 0.75rem; overflow: auto; }
+    .code-block code.hljs { display: block; white-space: pre; background: transparent; padding: 0; }
     .http-url { color: var(--vscode-editor-foreground); }
     .http-query-sep, .http-query-equals { color: var(--vscode-editor-foreground); }
     .hljs-comment { color: #57A64A; font-style: italic; }
@@ -175,10 +177,11 @@ function highlightTemplateVariables(value: string): string {
 
 function renderGenericCodeFence(info: string, content: string): string {
   const language = normalizeFenceLanguage(info);
+  const highlighted = highlightCodeFenceContent(content, language);
   return [
     `<div class="code-block" data-language="${escapeHtml(language)}">`,
     `<div class="code-toolbar"><span class="code-language">${escapeHtml(language)}</span></div>`,
-    `<pre><code class="language-${escapeHtml(language)}">${escapeHtml(content)}</code></pre>`,
+    `<pre><code class="hljs language-${escapeHtml(language)}">${highlighted}</code></pre>`,
     `</div>`
   ].join("");
 }
@@ -186,4 +189,15 @@ function renderGenericCodeFence(info: string, content: string): string {
 function normalizeFenceLanguage(info: string): string {
   const normalized = info.trim().split(/\s+/)[0]?.toLowerCase();
   return normalized || "text";
+}
+
+function highlightCodeFenceContent(content: string, language: string): string {
+  const normalizedLanguage = language === "text" ? "" : language;
+  if (!normalizedLanguage) {
+    return hljs.highlightAuto(content).value;
+  }
+  if (hljs.getLanguage(normalizedLanguage)) {
+    return hljs.highlight(content, { language: normalizedLanguage, ignoreIllegals: true }).value;
+  }
+  return hljs.highlightAuto(content).value;
 }

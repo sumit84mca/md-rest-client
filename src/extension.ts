@@ -83,13 +83,13 @@ export function activate(context: vscode.ExtensionContext): void {
       return;
     }
 
-    const sourceEditor = await vscode.window.showTextDocument(document, { preview: false });
-    responseViewColumn = nextViewColumn(sourceEditor.viewColumn);
+    const sourceColumn = vscode.window.activeTextEditor?.viewColumn ?? vscode.ViewColumn.One;
+    responseViewColumn = nextViewColumn(sourceColumn);
 
     const panel = vscode.window.createWebviewPanel(
       "markdownRestPreview",
       `MdRestClient: ${document.fileName.split("\\").pop() ?? "Untitled"}`,
-      vscode.ViewColumn.Beside,
+      sourceColumn,
       { enableScripts: true, retainContextWhenHidden: true }
     );
 
