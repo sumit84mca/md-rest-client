@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "README.md"
+      - "LICENSE.txt"
+      - "THIRD_PARTY_NOTICES.md"
+      - "images/**"
+      - ".vscodeignore"
+      - ".npmignore"
 
 permissions:
   contents: write
