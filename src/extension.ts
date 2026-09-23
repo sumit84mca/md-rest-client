@@ -14,22 +14,43 @@ export function activate(context: vscode.ExtensionContext): void {
   let responsePanel: vscode.WebviewPanel | undefined;
   let openPreviewPanels = 0;
   let lastPreviewDocumentUri: vscode.Uri | undefined;
+  const output = vscode.window.createOutputChannel("MdRestClient");
   const environmentStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   environmentStatusBar.name = "Markdown REST Environment";
   environmentStatusBar.command = "markdownRestPreview.switchEnvironment";
 
-  context.subscriptions.push(environmentStatusBar);
+  context.subscriptions.push(environmentStatusBar, output);
+
+  const logError = (scope: string, error: unknown, metadata?: Record<string, string>): void => {
+    const timestamp = new Date().toISOString();
+    output.appendLine(`[${timestamp}] ${scope}`);
+    if (metadata) {
+      for (const [key, value] of Object.entries(metadata)) {
+        output.appendLine(`  ${key}: ${value}`);
+      }
+    }
+    if (error instanceof Error) {
+      output.appendLine(`  message: ${error.message}`);
+      if (error.stack) {
+        output.appendLine("  stack:");
+        output.appendLine(error.stack);
+      }
+    } else {
+      output.appendLine(`  message: ${String(error)}`);
+    }
+    output.appendLine("");
+  };
 
   const updateEnvironmentStatusBar = (documentUri?: vscode.Uri): void => {
     if (!documentUri) {
       environmentStatusBar.text = NO_ENVIRONMENT_LABEL;
-      environmentStatusBar.tooltip = "Switch REST Client Environment";
+      environmentStatusBar.tooltip = "MdRestClient: Switch environment for Markdown REST requests";
       environmentStatusBar.show();
       return;
     }
     const environment = resolveEnvironment(documentUri);
-    environmentStatusBar.text = environment.name ?? NO_ENVIRONMENT_LABEL;
-    environmentStatusBar.tooltip = "Switch REST Client Environment";
+    environmentStatusBar.text = environment.name ? `MdRest: ${environment.name}` : NO_ENVIRONMENT_LABEL;
+    environmentStatusBar.tooltip = "MdRestClient: Switch environment for Markdown REST requests";
     environmentStatusBar.show();
   };
 
@@ -44,7 +65,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
       const { items } = buildEnvironmentPickItems(targetUri);
       const selected = await vscode.window.showQuickPick(items, {
-        placeHolder: "Select REST Client Environment"
+        placeHolder: "MdRestClient: Select environment"
       });
       if (!selected) {
         return;
@@ -130,7 +151,12 @@ export function activate(context: vscode.ExtensionContext): void {
 
       const rawRequest = requestMap.get(message.requestId);
       if (!rawRequest) {
-        vscode.window.showErrorMessage("Request block not found.");
+        const error = new Error("Request block not found.");
+        vscode.window.showErrorMessage(error.message);
+        logError("executeRequest", error, {
+          requestId: message.requestId,
+          document: activeDocument.uri.toString()
+        });
         return;
       }
 
@@ -140,8 +166,9 @@ export function activate(context: vscode.ExtensionContext): void {
         running: true
       });
 
+      let resolvedRequest: string | undefined;
       try {
-        const resolvedRequest = prepareRequest(rawRequest, activeDocument.uri);
+        resolvedRequest = prepareRequest(rawRequest, activeDocument.uri);
         const result = await executeHttpRequest(resolvedRequest);
         const targetColumn = responseViewColumn ?? vscode.ViewColumn.Beside;
 
@@ -161,7 +188,13 @@ export function activate(context: vscode.ExtensionContext): void {
         responsePanel.webview.html = buildResponsePreviewHtml(result);
         responsePanel.reveal(targetColumn, true);
       } catch (error) {
-        vscode.window.showErrorMessage(error instanceof Error ? error.message : String(error));
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        vscode.window.showErrorMessage(errorMessage);
+        logError("executeRequest", error, {
+          requestId: message.requestId,
+          document: activeDocument.uri.toString(),
+          request: firstRequestLine(resolvedRequest ?? rawRequest)
+        });
       } finally {
         panel.webview.postMessage({
           type: "requestExecutionState",
@@ -173,6 +206,16 @@ export function activate(context: vscode.ExtensionContext): void {
   });
 
   context.subscriptions.push(openPreviewCommand, switchEnvironmentCommand);
+}
+
+function firstRequestLine(request: string): string {
+  for (const line of request.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (trimmed.length > 0) {
+      return trimmed;
+    }
+  }
+  return "<empty>";
 }
 
 async function resolveMarkdownDocument(resource?: vscode.Uri): Promise<vscode.TextDocument | undefined> {

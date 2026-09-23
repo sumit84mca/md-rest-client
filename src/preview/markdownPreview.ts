@@ -20,6 +20,7 @@ export function buildPreviewHtml(markdownSource: string): { html: string; reques
   });
 
   const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
+  md.renderer.rules.fence = (tokens, index) => renderGenericCodeFence(tokens[index].info, tokens[index].content);
   const body = md.render(transformed);
 
   const html = `<!DOCTYPE html>
@@ -34,6 +35,10 @@ export function buildPreviewHtml(markdownSource: string): { html: string; reques
     .run-request { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; }
     .run-request:hover { background: var(--vscode-button-hoverBackground); }
     .rest-block pre { margin: 0; padding: 0.75rem; overflow: auto; }
+    .code-block { border: 1px solid var(--vscode-panel-border); border-radius: 8px; margin: 1rem 0; overflow: hidden; }
+    .code-toolbar { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--vscode-panel-border); background: var(--vscode-editorWidget-background); }
+    .code-language { font-size: 0.85rem; color: var(--vscode-descriptionForeground); text-transform: lowercase; }
+    .code-block pre { margin: 0; padding: 0.75rem; overflow: auto; }
     .http-url { color: var(--vscode-editor-foreground); }
     .http-query-sep, .http-query-equals { color: var(--vscode-editor-foreground); }
     .hljs-comment { color: #57A64A; font-style: italic; }
@@ -166,4 +171,19 @@ function renderQueryPairs(query: string): string {
 
 function highlightTemplateVariables(value: string): string {
   return value.replace(/\{\{[^}]+\}\}/g, (match) => `<span class="hljs-number">${match}</span>`);
+}
+
+function renderGenericCodeFence(info: string, content: string): string {
+  const language = normalizeFenceLanguage(info);
+  return [
+    `<div class="code-block" data-language="${escapeHtml(language)}">`,
+    `<div class="code-toolbar"><span class="code-language">${escapeHtml(language)}</span></div>`,
+    `<pre><code class="language-${escapeHtml(language)}">${escapeHtml(content)}</code></pre>`,
+    `</div>`
+  ].join("");
+}
+
+function normalizeFenceLanguage(info: string): string {
+  const normalized = info.trim().split(/\s+/)[0]?.toLowerCase();
+  return normalized || "text";
 }
