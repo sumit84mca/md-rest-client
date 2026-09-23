@@ -22,7 +22,12 @@ export async function executeHttpRequest(rawRequest: string): Promise<RequestExe
     init.body = parsedRequest.body;
   }
 
-  const response = await fetch(parsedRequest.url, init);
+  let response: Response;
+  try {
+    response = await fetch(parsedRequest.url, init);
+  } catch (error) {
+    throw buildRequestExecutionError(parsedRequest, error);
+  }
   const responseHeaders: Record<string, string> = {};
   response.headers.forEach((value, key) => {
     responseHeaders[key] = value;
@@ -137,4 +142,69 @@ function parseHttpRequest(rawRequest: string): ParsedHttpRequest {
 
   const body = nextLineIndex < lines.length ? lines.slice(nextLineIndex).join("\n").trim() : undefined;
   return { method, url, headers, body };
+}
+
+function buildRequestExecutionError(request: ParsedHttpRequest, error: unknown): Error {
+  const reason = extractExecutionFailureReason(error);
+  return new Error(`Request failed (${request.method} ${request.url}): ${reason}`);
+}
+
+function extractExecutionFailureReason(error: unknown): string {
+  if (!(error instanceof Error)) {
+    return String(error);
+  }
+
+  const details = extractCauseDetail(error.cause);
+  if (error.message && error.message !== "fetch failed") {
+    return details ? `${error.message} (${details})` : error.message;
+  }
+
+  return details ?? error.message;
+}
+
+function extractCauseDetail(cause: unknown): string | undefined {
+  if (!cause) {
+    return undefined;
+  }
+
+  if (cause instanceof Error) {
+    const nested = extractCauseDetail(cause.cause);
+    if (nested) {
+      return `${cause.message} (${nested})`;
+    }
+    return cause.message;
+  }
+
+  if (typeof cause === "object") {
+    const code = readStringProperty(cause, "code");
+    const message = readStringProperty(cause, "message");
+    const address = readStringProperty(cause, "address");
+    const port = readNumericProperty(cause, "port");
+
+    const endpoint = address && typeof port === "number" ? `${address}:${port}` : undefined;
+    if (code && endpoint) {
+      return `${code} (${endpoint})`;
+    }
+    if (code && message) {
+      return `${code} (${message})`;
+    }
+    if (code) {
+      return code;
+    }
+    if (message) {
+      return message;
+    }
+  }
+
+  return String(cause);
+}
+
+function readStringProperty(value: object, name: string): string | undefined {
+  const candidate = (value as Record<string, unknown>)[name];
+  return typeof candidate === "string" && candidate.length > 0 ? candidate : undefined;
+}
+
+function readNumericProperty(value: object, name: string): number | undefined {
+  const candidate = (value as Record<string, unknown>)[name];
+  return typeof candidate === "number" ? candidate : undefined;
 }

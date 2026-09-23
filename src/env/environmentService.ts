@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { EnvironmentResolution, EnvironmentVariables } from "../types";
 
-export const NO_ENVIRONMENT_LABEL = "No Environment";
+export const NO_ENVIRONMENT_LABEL = "MdRest: No Env";
 
 export type EnvironmentPickItem = vscode.QuickPickItem & { name: string | undefined };
 
