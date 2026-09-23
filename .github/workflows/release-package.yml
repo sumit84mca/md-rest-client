@@ -52,11 +52,10 @@ jobs:
           name: md-rest-client-vsix
           path: "*.vsix"
 
-      - name: Enforce version bump
+      - name: Skip existing release tag
         if: steps.tagcheck.outputs.exists == 'true'
         run: |
-          echo "Version v${{ steps.version.outputs.value }} already released. Bump package.json version before merge."
-          exit 1
+          echo "Version v${{ steps.version.outputs.value }} already released. Skipping release creation."
 
       - name: Create GitHub release
         if: steps.tagcheck.outputs.exists == 'false'
