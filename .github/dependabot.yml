@@ -6,7 +6,17 @@ updates:
       interval: weekly
       day: monday
       time: "03:00"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
+    ignore:
+      - dependency-name: "@types/vscode"
+    groups:
+      npm-all:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
     labels:
       - dependencies
 
@@ -16,6 +26,10 @@ updates:
       interval: weekly
       day: monday
       time: "03:30"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
+    groups:
+      actions-all:
+        patterns:
+          - "*"
     labels:
       - dependencies
