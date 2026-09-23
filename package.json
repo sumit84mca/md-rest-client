@@ -2,7 +2,7 @@
   "name": "md-rest-client",
   "displayName": "MdRestClient",
   "description": "Execute REST requests from Markdown preview in VS Code.",
-  "version": "0.1.1",
+  "version": "0.1.6",
   "publisher": "sumit84mca",
   "license": "MIT",
   "repository": {
@@ -21,7 +21,7 @@
     "rest-client"
   ],
   "engines": {
-    "vscode": "^1.137.0"
+    "vscode": "^1.81.0"
   },
   "categories": [
     "Other"
@@ -98,10 +98,11 @@
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^26.6.1",
-    "@types/vscode": "^1.138.0",
+    "@types/vscode": "^1.81.0",
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "highlight.js": "^11.11.1",
     "markdown-it": "^15.0.2"
   }
 }

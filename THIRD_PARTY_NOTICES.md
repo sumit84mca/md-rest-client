@@ -17,6 +17,7 @@ This extension includes/adapts ideas and styling patterns from the projects belo
 - Project: https://github.com/highlightjs/highlight.js
 - License: BSD 3-Clause License
 - Usage in this extension:
+  - Runtime syntax highlighting for markdown fenced code blocks in preview
   - Compatible CSS class naming (`hljs-*`) and highlighting conventions in webview rendering
 
 ## markdown-it
@@ -25,4 +26,3 @@ This extension includes/adapts ideas and styling patterns from the projects belo
 - License: MIT
 - Usage in this extension:
   - Markdown rendering engine used by the preview webview
-

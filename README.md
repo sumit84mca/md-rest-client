@@ -32,8 +32,11 @@ Content-Type: application/json
 
 1. Open a markdown file.
 2. Run command: **Markdown REST: Open Preview**.
+   - Preview opens in current editor group as tab (no forced split pane).
 3. Click **Run request** on any `http` block.
 4. Response opens in one reusable response tab on right side.
+
+Preview also applies syntax highlighting for fenced code blocks (for example `json`, `js`, `xml`, `sql`, etc.).
 
 All fenced code blocks are rendered as styled blocks with language label (for example `json`, `javascript`, `yaml`, `sql`).
 
