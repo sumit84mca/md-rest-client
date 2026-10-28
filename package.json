@@ -96,13 +96,13 @@
     "package:vsix": "npm run compile && npx @vscode/vsce package"
   },
   "devDependencies": {
-    "@types/markdown-it": "^14.1.2",
-    "@types/node": "^26.6.1",
-    "@types/vscode": "^1.81.0",
-    "typescript": "^5.5.4"
+    "@types/markdown-it": "^14.2.0",
+    "@types/node": "^26.6.5",
+    "@types/vscode": "^1.140.0",
+    "typescript": "^7.0.2"
   },
   "dependencies": {
-    "highlight.js": "^11.11.1",
-    "markdown-it": "^15.0.2"
+    "highlight.js": "^11.12.0",
+    "markdown-it": "^15.0.3"
   }
 }
